@@ -52,18 +52,11 @@ class EasyadbpyWindow(Window):
 
         self.APKviewer.set_search_column(0)
 
-        # Allow sorting on the column
-        self.tvcolumn.set_sort_column_id(0) #kollom sorteren bij kollom 1
-
-        # Allow drag and drop reordering of rows
-        self.APKviewer.set_reorderable(True)
-
-        
         #//////////////////////Devicelist/////////////////////////
         self.tvcolumn = Gtk.TreeViewColumn('Devices') #make kollom
 
         self.Devicelist.append_column(self.tvcolumn) # set kollom
-        
+
         self.cell = Gtk.CellRendererText() #make new rendercell
 
         self.tvcolumn.pack_start(self.cell, True) #Start the rendercell
@@ -71,12 +64,6 @@ class EasyadbpyWindow(Window):
         self.tvcolumn.add_attribute(self.cell, 'text', 0) #Add the cell
 
         self.Devicelist.set_search_column(0)
-
-        # Allow sorting on the column
-        self.tvcolumn.set_sort_column_id(0) #kollom sorteren bij kollom 1
-
-        # Allow drag and drop reordering of rows
-        self.Devicelist.set_reorderable(True)
 
         self.on_Refresh_ADB_activate(None)
 
@@ -111,7 +98,32 @@ class EasyadbpyWindow(Window):
     
     def on_button2_clicked(self, widget):
         print "Pull APK button pressed"
-        print self.getselectionname(self.APPselection)
+        output =  self.getselectionname(self.APPselection)
+
+        if not output == None:
+            Parent, Child = output
+
+            dialog = Gtk.FileChooserDialog("Please choose a location to save the application", self, Gtk.FileChooserAction.SAVE,(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+            print Child
+            dialog.set_current_name(Child)
+            filter_text = Gtk.FileFilter()
+            filter_text.set_name("Android Package")
+            filter_text.add_pattern("*.apk")
+
+            value = dialog.run()
+            dialog.hide()
+            if value == -5:
+                if Parent == 'DATA':
+                    self.ADB.PullDATAAPK(Child, dialog.get_filename())
+                elif Parent == 'SYSTEM':
+                    self.ADB.PullSYSTEMAPK(Child, dialog.get_filename())
+                elif Parent == 'SDCARD':
+                    print Child
+                else:
+                    print 'Something went teribly wrong'
+            
+            
+            
 
     def on_button3_clicked(self, widget):
         print "Uninstall APK button pressed"
@@ -138,6 +150,11 @@ class EasyadbpyWindow(Window):
              self.ADB.selectdevice(treestore)
 
         print self.ADB.Device, 'Selected'
+        if self.ADB.SDK > 7:
+            print 'The device has SDK version:', self.ADB.SDK
+        else:
+            print 'The device has SDK version:', self.ADB.SDK
+            print 'No SDCARD apps wil be founded!'
         self.UpdateAPPlist()
 
     def UpdateAPPlist(self):
@@ -146,23 +163,24 @@ class EasyadbpyWindow(Window):
         piter = treestore.append(None, ['DATA'])
         for child in self.ADB.GetDATAapplist():
             treestore.append(piter, [child])
-        if self.ADB.GetAndroidSDK() > 7:
+
+        if self.ADB.SDK > 7:
             piter = treestore.append(None, ['SDCARD'])
             for child in self.ADB.GetSDCARDapplist():
                 treestore.append(piter, [child])
+
         piter = treestore.append(None, ['SYSTEM'])
         for child in self.ADB.GetSYSTEMapplist():
             treestore.append(piter, [child])
 
         self.APKviewer.set_model(treestore)
+        self.APKviewer.expand_all()
 
     def getselectionname(self, treeselection):
         model , select = treeselection.get_selected()
-        node = model.get_iter_first()
-        returnvalue = model
-        print model[node][0]
-        return returnvalue
-
+        if model.iter_has_child(select) == False:
+            return model[model.iter_parent(select)][0] , model[select][0]
+             
 
 
 

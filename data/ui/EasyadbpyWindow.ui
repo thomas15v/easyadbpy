@@ -3,6 +3,11 @@
   <!-- interface-requires gtk+ 3.0 -->
   <!-- interface-requires easyadbpy_window 1.0 -->
   <!-- interface-local-resource-path ../media -->
+  <object class="GtkImage" id="image1">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">easyadbpy.svg</property>
+  </object>
   <object class="GtkDialog" id="dialog1">
     <property name="width_request">400</property>
     <property name="height_request">300</property>
@@ -73,11 +78,6 @@
       <action-widget response="-1">button5</action-widget>
       <action-widget response="1">Select</action-widget>
     </action-widgets>
-  </object>
-  <object class="GtkImage" id="image1">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">easyadbpy.svg</property>
   </object>
   <object class="EasyadbpyWindow" id="easyadbpy_window">
     <property name="width_request">400</property>
@@ -163,7 +163,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <child internal-child="selection">
-                      <object class="GtkTreeSelection" id="treeview-selection2"/>
+                      <object class="GtkTreeSelection" id="treeview-selection2">
+                        <property name="mode">browse</property>
+                      </object>
                     </child>
                   </object>
                 </child>

@@ -9,6 +9,8 @@ import shlex, subprocess
 #ADB CLASS
 class ADBhandler:
     Device = None
+    SDK = int
+
     def getdevicelist(self):
         devicelist =  subprocess.check_output(['adb', 'devices'])
         devicelist = devicelist.replace('List of devices attached', '')
@@ -27,6 +29,7 @@ class ADBhandler:
 
     def selectdevice(self, device):
         self.Device = device.split()[0]
+        self.SDK = self.GetAndroidSDK()
         
     def GetDATAapplist(self):
         return self.GetFilelist('/data/app/*.apk')
@@ -35,12 +38,11 @@ class ADBhandler:
         return self.GetFilelist('/system/app/*.apk')
 
     def GetSDCARDapplist(self):
-        if self.GetAndroidSDK() > 7:
-            self.GetAndroidSDK()
-            returnstring = list()
-            for text in self.GetFilelist('/mnt/asec/'):
-                returnstring.append(text + '.apk')
-            return returnstring
+        self.GetAndroidSDK()
+        returnstring = list()
+        for text in self.GetFilelist('/mnt/asec/'):
+            returnstring.append(text + '.apk')
+        return returnstring
        
     def GetFilelist(self, path):
         p = subprocess.Popen(['adb -s %s shell' % self.Device], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
@@ -64,6 +66,18 @@ class ADBhandler:
             return -1
         return None
 
+    def PullSYSTEMAPK(self, apkname, location):
+        subprocess.Popen(['adb pull /system/app/%s %s' % (apkname, location)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+
+    def PullDATAAPK(self, apkname, location):
+        subprocess.Popen(['adb pull /data/app/%s %s' % (apkname, location)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+   
+    def PullSDCARDAPK(self, apkname, location):
+        subprocess.Popen(['adb pull /mnt/asec/%s/pkg.apk %s' % (apkname.replace('.apk',''), location)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+
     def GetAndroidSDK(self):
-        value = subprocess.check_output(['adb -s %s shell cat /system/build.prop | grep ro.build.version.sdk' % self.Device], shell=True)
-        return value.split('=')[1]
+        if not self.Device == None:
+            value = subprocess.check_output(['adb -s %s shell cat /system/build.prop | grep ro.build.version.sdk' % self.Device], shell=True)
+            return int(value.split('=')[1])
+        else:
+            raise exception('No Device selected')
