@@ -12,6 +12,8 @@ class ADBhandler:
     SDK = int
 
     def getdevicelist(self):
+        print "Make sure ADB server is running..."
+        subprocess.Popen(['adb start-server'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True).communicate()
         devicelist =  subprocess.check_output(['adb', 'devices'])
         devicelist = devicelist.replace('List of devices attached', '')
         treestore = Gtk.TreeStore(str)
@@ -57,8 +59,10 @@ class ADBhandler:
                 returnstring.append(text)
         return returnstring
 
-    def installAPK(self, filename):
-        output = subprocess.Popen(['adb install %s' % filename] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+    def installAPK(self, filename, args):
+        print 'installing', filename
+        print 'adb install -s %s install %s %s' % (self.Device, args, filename)
+        output = subprocess.Popen(['adb -s %s install %s %s' % (self.Device, args, filename)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
         output , err = output.communicate()
         print output
         if '[INSTALL_FAILED_ALREADY_EXISTS]' in output:
@@ -67,13 +71,13 @@ class ADBhandler:
         return None
 
     def PullSYSTEMAPK(self, apkname, location):
-        subprocess.Popen(['adb pull /system/app/%s %s' % (apkname, location)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+        subprocess.Popen(['adb -s %s pull /system/app/%s %s' % (self.Device, apkname, location)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
 
     def PullDATAAPK(self, apkname, location):
-        subprocess.Popen(['adb pull /data/app/%s %s' % (apkname, location)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+        subprocess.Popen(['adb -s %s pull /data/app/%s %s' % (self.Device, apkname, location)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
    
     def PullSDCARDAPK(self, apkname, location):
-        subprocess.Popen(['adb pull /mnt/asec/%s/pkg.apk %s' % (apkname.replace('.apk',''), location)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+        subprocess.Popen(['adb -s %s pull /mnt/asec/%s/pkg.apk %s' % (self.Device, apkname.replace('.apk',''), location)] ,stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
 
     def GetAndroidSDK(self):
         if not self.Device == None:
