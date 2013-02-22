@@ -1,0 +1,8 @@
+[Desktop Entry]
+_Name=Easyadbpy
+_Comment=Easyadbpy application
+Categories=GNOME;Utility;
+Exec=easyadbpy
+Icon=easyadbpy
+Terminal=false
+Type=Application
