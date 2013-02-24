@@ -1,0 +1,8 @@
+[Desktop Entry]
+_Name=Easy ADB
+_Comment=EasyAdb application
+Categories=GNOME;Utility;
+Exec=easy-adb
+Icon=easy-adb
+Terminal=false
+Type=Application

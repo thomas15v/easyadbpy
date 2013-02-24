@@ -1,0 +1,11 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: easy-adb
+Upstream-Contact: Thomas Vanmellaerts <tvanmellaerts@live.be>
+Source: https://launchpad.net/easy
+
+Files: *
+Copyright: (C) 2013 Thomas Vanmellaerts <tvanmellaerts@live.be>
+Copyright: (C) 2013 Thomas Vanmellaerts <tvanmellaerts@live.be></property><property name="can_focus">False</property>
+License: GPL-3
+ The full text of the GPL is distributed in
+ /usr/share/common-licenses/GPL-3 on Debian systems.
