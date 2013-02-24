@@ -1,3 +1,5 @@
-project = easyadbpy
+project = easy-adb
 version = 12.08.1
 template = ubuntu-application
+ppa = easyadb
+lp_id = easy

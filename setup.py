@@ -1,7 +1,18 @@
 #!/usr/bin/env python
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 ### BEGIN LICENSE
-# This file is in the public domain
+# Copyright (C) 2013 Thomas Vanmellaerts <tvanmellaerts@live.be>
+# This program is free software: you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License version 3, as published 
+# by the Free Software Foundation.
+# 
+# This program is distributed in the hope that it will be useful, but 
+# WITHOUT ANY WARRANTY; without even the implied warranties of 
+# MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR 
+# PURPOSE.  See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along 
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
 ### END LICENSE
 
 ###################### DO NOT TOUCH THIS (HEAD TO THE SECOND PART) ######################
@@ -12,13 +23,13 @@ import sys
 try:
     import DistUtilsExtra.auto
 except ImportError:
-    print >> sys.stderr, 'To build easyadbpy you need https://launchpad.net/python-distutils-extra'
+    print >> sys.stderr, 'To build easy-adb you need https://launchpad.net/python-distutils-extra'
     sys.exit(1)
 assert DistUtilsExtra.auto.__version__ >= '2.18', 'needs DistUtilsExtra.auto >= 2.18'
 
 def update_config(libdir, values = {}):
 
-    filename = os.path.join(libdir, 'easyadbpy_lib/easyadbpyconfig.py')
+    filename = os.path.join(libdir, 'easy_adb_lib/easy_adbconfig.py')
     oldvalues = {}
     try:
         fin = file(filename, 'r')
@@ -49,16 +60,16 @@ def move_desktop_file(root, target_data, prefix):
 
     old_desktop_path = os.path.normpath(root + target_data +
                                         '/share/applications')
-    old_desktop_file = old_desktop_path + '/easyadbpy.desktop'
+    old_desktop_file = old_desktop_path + '/easy-adb.desktop'
     desktop_path = os.path.normpath(root + prefix + '/share/applications')
-    desktop_file = desktop_path + '/easyadbpy.desktop'
+    desktop_file = desktop_path + '/easy-adb.desktop'
 
     if not os.path.exists(old_desktop_file):
         print ("ERROR: Can't find", old_desktop_file)
         sys.exit(1)
     elif target_data != prefix + '/':
         # This is an /opt install, so rename desktop file to use extras-
-        desktop_file = desktop_path + '/extras-easyadbpy.desktop'
+        desktop_file = desktop_path + '/extras-easy-adb.desktop'
         try:
             os.makedirs(desktop_path)
             os.rename(old_desktop_file, desktop_file)
@@ -77,10 +88,10 @@ def update_desktop_file(filename, target_pkgdata, target_scripts):
 
         for line in fin:
             if 'Icon=' in line:
-                line = "Icon=%s\n" % (target_pkgdata + 'media/easyadbpy.svg')
+                line = "Icon=%s\n" % (target_pkgdata + 'media/easy-adb.png')
             elif 'Exec=' in line:
                 cmd = line.split("=")[1].split(None, 1)
-                line = "Exec=%s" % (target_scripts + 'easyadbpy')
+                line = "Exec=%s" % (target_scripts + 'easy-adb')
                 if len(cmd) > 1:
                     line += " %s" % cmd[1].strip()  # Add script arguments back
                 line += "\n"
@@ -107,10 +118,10 @@ class InstallAndUpdateDataDirectory(DistUtilsExtra.auto.install_auto):
         DistUtilsExtra.auto.install_auto.run(self)
 
         target_data = '/' + os.path.relpath(self.install_data, self.root) + '/'
-        target_pkgdata = target_data + 'share/easyadbpy/'
+        target_pkgdata = target_data + 'share/easy-adb/'
         target_scripts = '/' + os.path.relpath(self.install_scripts, self.root) + '/'
 
-        values = {'__easyadbpy_data_directory__': "'%s'" % (target_pkgdata),
+        values = {'__easy_adb_data_directory__': "'%s'" % (target_pkgdata),
                   '__version__': "'%s'" % self.distribution.get_version()}
         update_config(self.install_lib, values)
 
@@ -124,14 +135,17 @@ class InstallAndUpdateDataDirectory(DistUtilsExtra.auto.install_auto):
 ##################################################################################
 
 DistUtilsExtra.auto.setup(
-    name='easyadbpy',
-    version='0.1',
-    #license='GPL-3',
-    #author='Your Name',
-    #author_email='email@ubuntu.com',
-    #description='UI for managing …',
-    #long_description='Here a longer description',
-    #url='https://launchpad.net/easyadbpy',
-    cmdclass={'install': InstallAndUpdateDataDirectory}
+    name='easy-adb',
+    version='0.1-public1-beta',
+    license='GPL-3',
+    author='Thomas Vanmellaerts',
+    author_email='tvanmellaerts@live.be',
+    description='UI for managing Android debug bridge',
+    url='https://launchpad.net/easy',
+    long_description='This program (will) allow you to install, uninstall or get instation files or apk''s from your droid device',
+    #url='https://launchpad.net/easyadb',
+    cmdclass={'install': InstallAndUpdateDataDirectory},
+    dependencies='android-tools-adb'
+    
     )
 
